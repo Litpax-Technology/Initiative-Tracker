@@ -283,6 +283,17 @@ async function setStatus(taskId, status) {
 }
 
 // ---------- COMPLETE + RATING ----------
+function renderRatingOptions() {
+  const wrap = document.getElementById('ratingOptions');
+  const options = cfg('Rating Options').split(',').map(s => s.trim()).filter(Boolean);
+
+  wrap.innerHTML = options.map(opt => {
+    // Emoji hata ke plain rating store hoti hai Sheet mein
+    const plain = opt.replace(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}]/gu, '').trim();
+    return `<button class="rating-btn" data-rating="${esc(plain)}" onclick="selectRating(this)">${esc(opt)}</button>`;
+  }).join('');
+}
+
 function openCompleteModal(taskId) {
   selectedRating = '';
   document.getElementById('completeTaskId').value = taskId;
