@@ -34,6 +34,7 @@ async function loadAll() {
     updateOverallStats();
     renderEmployeeCards();
     renderTasks();
+    renderFundsView();
   } catch (err) {
     document.getElementById('taskList').innerHTML = '<div class="empty-state">⚠️ Data load nahi hua. Refresh karke dekho.</div>';
     showToast('Error: ' + err.message, true);
@@ -128,6 +129,67 @@ function renderTasks() {
         <div class="task-text">${esc(t.task)}</div>
         ${ratingChip}
         <div class="task-meta">${metaItems.join('')}</div>
+      </div>`;
+  }).join('');
+}
+
+// ---------- VIEW SWITCH (All / Funds) ----------
+function setView(view) {
+  const isFunds = view === 'funds';
+  document.getElementById('viewAll').classList.toggle('hidden', isFunds);
+  document.getElementById('viewFunds').classList.toggle('hidden', !isFunds);
+  document.getElementById('tabAll').classList.toggle('active', !isFunds);
+  document.getElementById('tabFunds').classList.toggle('active', isFunds);
+}
+
+// ---------- FUNDS REQUIRED VIEW ----------
+function renderFundsView() {
+  const list = document.getElementById('fundsList');
+
+  // Sirf wo tasks jinme funds/machine requirement likhi hai
+  const fundsTasks = allTasks.filter(t => String(t.funds || '').trim() !== '');
+
+  // Tab pe count badge
+  document.getElementById('fundsCount').textContent = fundsTasks.length > 0 ? fundsTasks.length : '';
+
+  if (fundsTasks.length === 0) {
+    list.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">💰</div>
+        Abhi kisi initiative mein funds ya machine ki requirement nahi hai.
+      </div>`;
+    return;
+  }
+
+  // Employee-wise group karke dikhao
+  const grouped = {};
+  fundsTasks.forEach(t => {
+    if (!grouped[t.employee]) grouped[t.employee] = [];
+    grouped[t.employee].push(t);
+  });
+
+  list.innerHTML = Object.keys(grouped).map(emp => {
+    const cards = grouped[emp].map(t => {
+      const badgeClass = t.status === 'Completed' ? 'done' : t.status === 'In Progress' ? 'progress' : 'pending';
+      return `
+        <div class="task-card">
+          <div class="task-top">
+            <span class="task-id">${t.taskId}</span>
+            <span class="badge ${badgeClass}">${t.status}</span>
+          </div>
+          <div class="funds-highlight">💰 ${esc(t.funds)}</div>
+          <div class="task-text" style="font-size:13.5px; font-weight:500; color:var(--text-soft);">Initiative: ${esc(t.task)}</div>
+          <div class="task-meta">
+            ${t.estimatedTime ? `<span class="meta-item">⏱ Time: <b>${esc(t.estimatedTime)}</b></span>` : ''}
+            <span class="meta-item">📅 Created: <b>${t.createdOn}</b></span>
+          </div>
+        </div>`;
+    }).join('');
+
+    return `
+      <div class="funds-group">
+        <div class="funds-group-head">👤 ${esc(emp)} <span class="funds-group-count">${grouped[emp].length} request${grouped[emp].length > 1 ? 's' : ''}</span></div>
+        ${cards}
       </div>`;
   }).join('');
 }
