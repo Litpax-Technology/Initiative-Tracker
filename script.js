@@ -72,15 +72,42 @@ async function init() {
 }
 
 // ---------- LOGIN / LOGOUT ----------
-function login() {
+async function login() {
   const name = document.getElementById('nameSelect').value;
+  const pin = document.getElementById('pinInput').value.trim();
+
   if (!name) {
     showToast('Pehle apna naam select karo', true);
     return;
   }
-  currentUser = name;
-  localStorage.setItem('litpax_initiative_user', name);
-  showDashboard();
+  if (!pin) {
+    showToast('PIN daalo', true);
+    return;
+  }
+
+  const btn = document.getElementById('loginBtn');
+  btn.disabled = true;
+  btn.textContent = 'Checking...';
+
+  try {
+    const res = await fetch(`${CONFIG.GAS_URL}?action=verifyPin&name=${encodeURIComponent(name)}&pin=${encodeURIComponent(pin)}`);
+    const data = await res.json();
+
+    if (!data.success) {
+      showToast(data.error || 'Galat PIN', true);
+      return;
+    }
+
+    currentUser = name;
+    localStorage.setItem('litpax_initiative_user', name);
+    document.getElementById('pinInput').value = '';
+    showDashboard();
+  } catch (err) {
+    showToast('Login error: ' + err.message, true);
+  } finally {
+    btn.disabled = false;
+    btn.textContent = 'Continue →';
+  }
 }
 
 function logout() {
