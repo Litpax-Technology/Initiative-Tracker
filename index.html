@@ -29,6 +29,8 @@
         <select id="nameSelect" class="input">
           <option value="">Loading names...</option>
         </select>
+        <label class="field-label" for="pinInput">Enter Your PIN</label>
+        <input type="password" id="pinInput" class="input" inputmode="numeric" maxlength="6" placeholder="****" onkeydown="if(event.key==='Enter')login()">
         <button id="loginBtn" class="btn btn-primary btn-block" onclick="login()">Continue →</button>
       </div>
     </div>
