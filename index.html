@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Litpax Initiative Tracker</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- ================= LOGIN SCREEN ================= -->
+  <div id="loginScreen" class="screen active">
+    <div class="login-box">
+      <div class="brand">
+        <div class="brand-mark">⚡</div>
+        <div class="brand-name">Litpax <span>Initiative Tracker</span></div>
+      </div>
+
+      <div class="quote-card">
+        <div class="quote-icon">&ldquo;</div>
+        <p id="quoteText" class="quote-text">Loading...</p>
+      </div>
+
+      <div class="login-form">
+        <label class="field-label" for="nameSelect">Select Your Name</label>
+        <select id="nameSelect" class="input">
+          <option value="">Loading names...</option>
+        </select>
+        <button id="loginBtn" class="btn btn-primary btn-block" onclick="login()">Continue →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= DASHBOARD SCREEN ================= -->
+  <div id="dashScreen" class="screen">
+    <header class="topbar">
+      <div class="brand small">
+        <div class="brand-mark">⚡</div>
+        <div class="brand-name">Initiative Tracker</div>
+      </div>
+      <div class="topbar-right">
+        <span id="userChip" class="user-chip"></span>
+        <button class="btn btn-ghost" onclick="logout()">Logout</button>
+      </div>
+    </header>
+
+    <main class="container">
+      <div class="dash-head">
+        <div>
+          <h1 id="greeting" class="dash-title">My Initiatives</h1>
+          <p class="dash-sub">Apne improvement ideas record karo, update karo, complete karo.</p>
+        </div>
+        <button class="btn btn-primary" onclick="openTaskModal()">＋ New Initiative</button>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-num" id="statTotal">0</div>
+          <div class="stat-label">Total</div>
+        </div>
+        <div class="stat-card pending">
+          <div class="stat-num" id="statPending">0</div>
+          <div class="stat-label">Pending</div>
+        </div>
+        <div class="stat-card progress">
+          <div class="stat-num" id="statProgress">0</div>
+          <div class="stat-label">In Progress</div>
+        </div>
+        <div class="stat-card done">
+          <div class="stat-num" id="statDone">0</div>
+          <div class="stat-label">Completed</div>
+        </div>
+      </div>
+
+      <!-- Filter tabs -->
+      <div class="filter-tabs" id="filterTabs">
+        <button class="tab active" data-filter="All" onclick="setFilter('All', this)">All</button>
+        <button class="tab" data-filter="Pending" onclick="setFilter('Pending', this)">Pending</button>
+        <button class="tab" data-filter="In Progress" onclick="setFilter('In Progress', this)">In Progress</button>
+        <button class="tab" data-filter="Completed" onclick="setFilter('Completed', this)">Completed</button>
+      </div>
+
+      <!-- Task cards -->
+      <div id="taskList" class="task-list">
+        <div class="loader" id="taskLoader">Loading your initiatives...</div>
+      </div>
+    </main>
+  </div>
+
+  <!-- ================= TASK MODAL (Add/Edit) ================= -->
+  <div id="taskModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-head">
+        <h2 id="modalTitle">New Initiative</h2>
+        <button class="modal-close" onclick="closeTaskModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editTaskId" value="">
+
+        <label class="field-label">Write down the task that you have in your mind *</label>
+        <textarea id="fTask" class="input" rows="3" placeholder="Kya improvement karna chahte ho?"></textarea>
+
+        <label class="field-label">How much time will it take?</label>
+        <input type="text" id="fTime" class="input" placeholder="e.g. 2 din, 1 hafta, 3 ghante">
+
+        <label class="field-label">Do you need a Buddy?</label>
+        <div class="radio-row">
+          <label class="radio-pill"><input type="radio" name="fBuddy" value="Yes" onchange="toggleBuddyName()"> Yes</label>
+          <label class="radio-pill"><input type="radio" name="fBuddy" value="No" checked onchange="toggleBuddyName()"> No</label>
+        </div>
+
+        <div id="buddyNameWrap" class="hidden">
+          <label class="field-label">Name Your Buddy</label>
+          <input type="text" id="fBuddyName" class="input" placeholder="Buddy ka naam">
+        </div>
+
+        <label class="field-label">Funds or machine will require? (elaborate)</label>
+        <textarea id="fFunds" class="input" rows="2" placeholder="Agar kuch chahiye to yahan likho, nahi to khali chhodo"></textarea>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeTaskModal()">Cancel</button>
+        <button id="saveTaskBtn" class="btn btn-primary" onclick="saveTask()">Save Initiative</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ================= COMPLETE MODAL (Rating) ================= -->
+  <div id="completeModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-head">
+        <h2>🎉 Task Completed!</h2>
+        <button class="modal-close" onclick="closeCompleteModal()">✕</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="completeTaskId" value="">
+        <p class="modal-question">How happy are you after the completion of this task?</p>
+        <div class="rating-options" id="ratingOptions">
+          <!-- Rating buttons Config sheet se load hote hain -->
+        </div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeCompleteModal()">Cancel</button>
+        <button id="confirmCompleteBtn" class="btn btn-primary" onclick="confirmComplete()" disabled>Mark Completed</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast -->
+  <div id="toast" class="toast"></div>
+
+  <script src="config.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>
