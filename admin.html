@@ -50,6 +50,15 @@
         </div>
       </div>
 
+      <!-- Main view tabs -->
+      <div class="filter-tabs" style="margin-bottom: 22px;">
+        <button class="tab main-tab active" id="tabAll" onclick="setView('all')">📋 All Initiatives</button>
+        <button class="tab main-tab" id="tabFunds" onclick="setView('funds')">💰 Funds Required <span id="fundsCount" class="funds-count"></span></button>
+      </div>
+
+      <!-- ============ VIEW: ALL INITIATIVES ============ -->
+      <div id="viewAll">
+
       <!-- Per-employee cards -->
       <div id="empGrid" class="emp-stats-grid">
         <div class="loader">Loading team data...</div>
@@ -66,6 +75,15 @@
       <!-- All tasks -->
       <div id="taskList" class="task-list">
         <div class="loader">Loading initiatives...</div>
+      </div>
+
+      </div><!-- /viewAll -->
+
+      <!-- ============ VIEW: FUNDS REQUIRED ============ -->
+      <div id="viewFunds" class="hidden">
+        <div id="fundsList" class="task-list">
+          <div class="loader">Loading funds requests...</div>
+        </div>
       </div>
     </main>
   </div>
