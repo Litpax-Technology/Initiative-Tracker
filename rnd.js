@@ -14,7 +14,7 @@ let ratingOptions = [];
 let uploadQueue = [];
 let selectedReviewRating = '';
 
-const LS_KEY = 'GAS_URL';
+const LS_KEY = 'CONFIG';
 
 const DEFAULTS = {
   'App Title': 'Litpax R&D Tracker',
