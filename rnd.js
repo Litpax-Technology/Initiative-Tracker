@@ -166,7 +166,7 @@ function projectCard(p) {
   const meta = [];
   meta.push(`<span class="meta-item">👤 By: <b>${esc(p.assignedBy)}</b></span>`);
   meta.push(`<span class="meta-item">🎯 To: <b>${esc(p.assignedTo)}</b></span>`);
-  if (p.deadline) meta.push(`<span class="meta-item">📅 Deadline: <b>${esc(p.deadline)}</b></span>`);
+  if (p.deadline) meta.push(`<span class="meta-item">📅 Deadline: <b>${esc(fmtDeadline(p.deadline))}</b></span>`);
   meta.push(`<span class="meta-item">🕒 Updated: <b>${esc(p.lastUpdated)}</b></span>`);
 
   return `
@@ -236,7 +236,7 @@ function renderDetail(p, timeline) {
   const meta = [];
   meta.push(`<span class="meta-item">👤 Assigned by: <b>${esc(p.assignedBy)}</b></span>`);
   meta.push(`<span class="meta-item">🎯 To: <b>${esc(p.assignedTo)}</b></span>`);
-  if (p.deadline) meta.push(`<span class="meta-item">📅 Deadline: <b>${esc(p.deadline)}</b></span>`);
+  if (p.deadline) meta.push(`<span class="meta-item">📅 Deadline: <b>${esc(fmtDeadline(p.deadline))}</b></span>`);
   meta.push(`<span class="meta-item">📆 Created: <b>${esc(p.createdOn)}</b></span>`);
   if (p.completedOn) meta.push(`<span class="meta-item">✅ Completed: <b>${esc(p.completedOn)}</b></span>`);
 
@@ -255,50 +255,69 @@ function renderDetail(p, timeline) {
     </div>
     ${banner}
     ${actions}
-    <div class="detail-head">
-      <div class="tl-head">📜 Project Timeline</div>
-      ${renderTimeline(timeline)}
-    </div>`;
+    <div class="tl-head" style="margin-top:6px;">📂 Project Records</div>
+    ${renderSections(timeline)}`;
 }
 
-function renderTimeline(items) {
-  if (!items || !items.length) return '<div class="empty-state" style="padding:20px;">Abhi koi activity nahi.</div>';
-  const dotIcon = { assigned: '📌', status: '🔄', note: '📝', remark: '💬', review: '⚖️',
-    photo: '🖼', video: '🎬', doc: '📄', link: '🔗' };
-  const dotClass = t => (['photo', 'video', 'doc', 'link'].includes(t)) ? 'media'
-    : (['assigned', 'status'].includes(t) ? 'status' : t);
+// Logs ko type ke hisaab se ALAG-ALAG sections me dikhao (oldest upar)
+function renderSections(items) {
+  if (!items || !items.length)
+    return '<div class="empty-state" style="padding:20px;">Abhi koi activity nahi.</div>';
 
-  return `<div class="timeline">${items.map(it => {
-    let body = '';
-    if (['photo', 'video', 'doc', 'link'].includes(it.type)) {
-      body = mediaHTML(it);
-    } else if (it.type === 'remark') {
-      body = `<div class="tl-body tl-remark">${esc(it.content)}</div>`;
-    } else {
-      body = `<div class="tl-body">${esc(it.content)}</div>`;
-    }
-    return `
-      <div class="tl-item">
-        <div class="tl-dot ${dotClass(it.type)}">${dotIcon[it.type] || '•'}</div>
-        <div class="tl-by">${esc(it.by || '—')} <span class="tl-time">· ${esc(it.at)}</span></div>
-        ${body}
-      </div>`;
-  }).join('')}</div>`;
+  const buckets = { photo: [], video: [], doc: [], link: [], note: [], remark: [], activity: [] };
+  items.forEach(it => {
+    if (buckets[it.type]) buckets[it.type].push(it);
+    else buckets.activity.push(it); // assigned, status, review
+  });
+
+  const order = [
+    ['photo',    '🖼 Photos'],
+    ['video',    '🎬 Videos'],
+    ['doc',      '📄 Documents'],
+    ['link',     '🔗 Links'],
+    ['note',     '📝 Notes'],
+    ['remark',   '💬 Remarks'],
+    ['activity', '🔄 Activity Log']
+  ];
+
+  let html = '';
+  order.forEach(([key, title]) => {
+    const arr = buckets[key];
+    if (!arr.length) return;
+    html += `<div class="rd-section">
+      <div class="rd-section-head">${title} <span class="rd-section-count">${arr.length}</span></div>`;
+    html += (key === 'photo')
+      ? `<div class="photo-grid">${arr.map(photoCell).join('')}</div>`
+      : `<div class="sec-list">${arr.map(logRow).join('')}</div>`;
+    html += `</div>`;
+  });
+  return html;
 }
 
-function mediaHTML(it) {
-  if (it.type === 'photo' && it.fileId) {
-    const thumb = `https://drive.google.com/thumbnail?id=${it.fileId}&sz=w600`;
-    return `<div class="tl-media">
-      <img class="tl-photo" src="${thumb}" onclick="openLightbox('${thumb.replace('w600','w1200')}')" loading="lazy" alt="">
-      ${it.content ? `<div class="tl-cap">${esc(it.content)}</div>` : ''}</div>`;
+function photoCell(it) {
+  if (!it.fileId) return logRow(it);
+  const thumb = `https://drive.google.com/thumbnail?id=${it.fileId}&sz=w400`;
+  return `<figure class="photo-cell">
+    <img src="${thumb}" onclick="openLightbox('${thumb.replace('w400', 'w1200')}')" loading="lazy" alt="">
+    ${it.content ? `<figcaption>${esc(it.content)}</figcaption>` : ''}
+  </figure>`;
+}
+
+function logRow(it) {
+  const who = `<div class="sec-by">${esc(it.by || '—')} <span class="tl-time">· ${esc(it.at)}</span></div>`;
+  let body;
+  if (it.type === 'video' || it.type === 'doc' || it.type === 'link' || it.type === 'photo') {
+    const url = it.fileUrl || '#';
+    const icon = it.type === 'video' ? '🎬' : it.type === 'link' ? '🔗' : it.type === 'photo' ? '🖼' : '📄';
+    const label = it.fileName || it.content || (it.type === 'video' ? 'Video' : it.type === 'link' ? 'Link' : it.type === 'photo' ? 'Photo' : 'Document');
+    body = `<a class="tl-file" href="${esc(url)}" target="_blank" rel="noopener">${icon} ${esc(label)}</a>`
+      + (it.content && it.fileName ? `<div class="tl-cap">${esc(it.content)}</div>` : '');
+  } else if (it.type === 'remark') {
+    body = `<div class="tl-body tl-remark">${esc(it.content)}</div>`;
+  } else {
+    body = `<div class="tl-body">${esc(it.content)}</div>`;
   }
-  const url = it.fileUrl || '#';
-  const icon = it.type === 'video' ? '🎬' : it.type === 'link' ? '🔗' : '📄';
-  const label = it.fileName || it.content || (it.type === 'video' ? 'Video' : it.type === 'link' ? 'Link' : 'Document');
-  return `<div class="tl-media">
-    <a class="tl-file" href="${esc(url)}" target="_blank" rel="noopener">${icon} ${esc(label)}</a>
-    ${(it.content && it.fileName) ? `<div class="tl-cap">${esc(it.content)}</div>` : ''}</div>`;
+  return `<div class="sec-item">${who}${body}</div>`;
 }
 
 // ---------- STATUS ----------
@@ -534,6 +553,14 @@ function esc(s) {
   return String(s == null ? '' : s)
     .replace(/&/g, '&amp;').replace(/</g, '&lt;')
     .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+// Deadline ko saaf dikhao: "2026-07-17T18:30:00.000Z" -> "17-Jul-2026"
+function fmtDeadline(d) {
+  if (!d) return '';
+  const m = String(d).match(/^(\d{4})-(\d{2})-(\d{2})/);
+  if (!m) return String(d);
+  const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return `${m[3]}-${months[+m[2] - 1]}-${m[1]}`;
 }
 let toastTimer;
 function showToast(msg, isError = false) {
