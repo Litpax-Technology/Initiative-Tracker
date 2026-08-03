@@ -51,8 +51,10 @@ async function init() {
       sel.appendChild(o);
     });
 
-    if (saved && allUsers.find(u => u.name === saved.name)) {
-      currentUser = saved.name; currentRole = saved.role;
+    const freshUser = saved && allUsers.find(u => u.name === saved.name);
+    if (freshUser) {
+      currentUser = freshUser.name;
+      currentRole = freshUser.role;   // localStorage ka purana nahi, server ka fresh role
       showList();
     }
   } catch (err) {
@@ -91,8 +93,9 @@ function logout() {
 }
 
 // ---------- ROLE HELPERS ----------
-const canAssign = () => currentRole === 'Director' || currentRole === 'Admin';
-const canReview = () => currentRole === 'Director' || currentRole === 'Admin';
+const roleIs = (...roles) => roles.some(r => r.toLowerCase() === String(currentRole).trim().toLowerCase());
+const canAssign = () => roleIs('Director', 'Admin');
+const canReview = () => roleIs('Director', 'Admin');
 
 // ---------- LIST ----------
 function showList() {
