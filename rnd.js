@@ -6,6 +6,7 @@ let currentUser = '';
 let currentRole = '';
 let allProjects = [];
 let allUsers = [];
+let allEmployees = [];
 let currentFilter = 'All';
 let currentProjectId = '';
 let currentProject = null;
@@ -34,6 +35,7 @@ async function init() {
 
     appConfig = data.config || {};
     allUsers = data.users || [];
+    allEmployees = data.employees || [];
     ratingOptions = cfg('Rating Options').split(',').map(s => s.trim()).filter(Boolean);
 
     const title = cfg('App Title');
@@ -341,8 +343,7 @@ function openAssignModal() {
   document.getElementById('aDeadline').value = '';
   document.querySelector('input[name="aPri"][value="Medium"]').checked = true;
   const sel = document.getElementById('aAssignTo');
-  const rd = allUsers.filter(u => u.role === 'R&D');
-  sel.innerHTML = (rd.length ? rd : allUsers).map(u => `<option value="${esc(u.name)}">${esc(u.name)}</option>`).join('');
+  sel.innerHTML = allEmployees.map(name => `<option value="${esc(name)}">${esc(name)}</option>`).join('');
   openModal('assignModal');
 }
 
