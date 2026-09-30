@@ -53,7 +53,10 @@ async function init() {
       sel.appendChild(o);
     });
 
-    const freshUser = saved && allUsers.find(u => u.name === saved.name);
+    const freshUser = saved && (
+      allUsers.find(u => u.name === saved.name) ||
+      (allEmployees.includes(saved.name) ? { name: saved.name, role: saved.role } : null)
+    );
     if (freshUser) {
       currentUser = freshUser.name;
       currentRole = freshUser.role;   // localStorage ka purana nahi, server ka fresh role
