@@ -191,6 +191,20 @@
     </div>
   </div>
 
+  <!-- ================= MEMBER PICKER MODAL ================= -->
+  <div id="memberModal" class="modal-overlay">
+    <div class="modal">
+      <div class="modal-head"><h2>👤 Aap kaun ho?</h2><button class="modal-close" onclick="closeModal('memberModal')">✕</button></div>
+      <div class="modal-body">
+        <p class="modal-question">Apna naam select karo:</p>
+        <div id="memberList" class="member-list"></div>
+      </div>
+      <div class="modal-foot">
+        <button class="btn btn-ghost" onclick="closeModal('memberModal')">Cancel</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Lightbox -->
   <div id="lightbox" class="lightbox" onclick="closeLightbox()">
     <button class="lightbox-close">✕</button>
