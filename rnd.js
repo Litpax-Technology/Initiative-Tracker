@@ -47,7 +47,7 @@ async function init() {
 
     const sel = document.getElementById('nameSelect');
     sel.innerHTML = '<option value="">-- Select Your Name --</option>';
-    allUsers.filter(u => u.hasPin).forEach(u => {
+    allUsers.forEach(u => {
       const o = document.createElement('option');
       o.value = u.name; o.textContent = `${u.name} (${u.role})`;
       sel.appendChild(o);
