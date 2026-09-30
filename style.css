@@ -918,3 +918,10 @@ body {
   color: var(--text);
   margin-bottom: 3px;
 }
+
+.member-list { display: grid; gap: 8px; margin: 14px 0; }
+.member-btn {
+  padding: 12px 14px; border: 1px solid #e5e7eb; border-radius: 10px;
+  background: #fff; text-align: left; font-size: 15px; cursor: pointer;
+}
+.member-btn:hover { border-color: #4f46e5; background: #eef2ff; }
