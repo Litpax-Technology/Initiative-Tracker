@@ -47,7 +47,7 @@ async function init() {
 
     const sel = document.getElementById('nameSelect');
     sel.innerHTML = '<option value="">-- Select Your Name --</option>';
-    allUsers.forEach(u => {
+    allUsers.filter(u => u.hasPin).forEach(u => {
       const o = document.createElement('option');
       o.value = u.name; o.textContent = `${u.name} (${u.role})`;
       sel.appendChild(o);
@@ -77,10 +77,9 @@ async function login() {
   try {
     const data = await getJSON('rdVerifyPin', { name, pin });
     if (!data.success) return showToast(data.error || 'Galat PIN', true);
-    currentUser = data.name; currentRole = data.role;
-    localStorage.setItem(LS_KEY, JSON.stringify({ name: currentUser, role: currentRole }));
     document.getElementById('pinInput').value = '';
-    showList();
+    if (data.members && data.members.length) return openMemberPicker(data.members, data.role);
+    setSession(data.name, data.role);
   } catch (err) {
     showToast('Login error: ' + err.message, true);
   } finally {
@@ -92,6 +91,24 @@ function logout() {
   localStorage.removeItem(LS_KEY);
   currentUser = ''; currentRole = ''; allProjects = [];
   showScreen('loginScreen');
+}
+
+let pendingRole = '';
+function setSession(name, role) {
+  currentUser = name; currentRole = role;
+  localStorage.setItem(LS_KEY, JSON.stringify({ name, role }));
+  showList();
+}
+function openMemberPicker(members, role) {
+  pendingRole = role;
+  document.getElementById('memberList').innerHTML = members.map(m =>
+    `<button class="member-btn" data-name="${esc(m)}" onclick="pickMember(this)">👤 ${esc(m)}</button>`
+  ).join('');
+  openModal('memberModal');
+}
+function pickMember(btn) {
+  closeModal('memberModal');
+  setSession(btn.dataset.name, pendingRole);
 }
 
 // ---------- ROLE HELPERS ----------
