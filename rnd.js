@@ -210,7 +210,7 @@ function backToList() { showScreen('listScreen'); loadProjects(); }
 
 function renderDetail(p, timeline) {
   const isOwner = p.assignedTo === currentUser;
-  const canWork = isOwner || currentRole === 'Admin';
+  const canWork = isOwner || roleIs('Admin');
 
   // Feedback banner
   let banner = '';
