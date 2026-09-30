@@ -105,9 +105,9 @@
       <div class="modal-head"><h2>Assign R&D Project</h2><button class="modal-close" onclick="closeModal('assignModal')">✕</button></div>
       <div class="modal-body">
         <label class="field-label">Project Title *</label>
-        <input type="text" id="aTitle" class="input" placeholder="e.g. Naye 48V pack ka thermal test">
+        <input type="text" id="aTitle" class="input" placeholder="e.g. Thermal test of new 48V pack">
         <label class="field-label">Description / Task Detail</label>
-        <textarea id="aDesc" class="input" rows="3" placeholder="Kya karna hai, kya expected output hai..."></textarea>
+        <textarea id="aDesc" class="input" rows="3" placeholder="What needs to be done, expected output..."></textarea>
         <label class="field-label">Assign To (R&D) *</label>
         <select id="aAssignTo" class="input"></select>
         <label class="field-label">Priority</label>
@@ -137,9 +137,9 @@
           <button class="tab" data-etype="link" onclick="setEntryType('link', this)">🔗 Link</button>
         </div>
         <label class="field-label" id="entryLabel">Note</label>
-        <textarea id="eContent" class="input" rows="3" placeholder="Yahan likho..."></textarea>
+        <textarea id="eContent" class="input" rows="3" placeholder="Write here..."></textarea>
         <div id="eLinkWrap" class="hidden">
-          <label class="field-label">Paste link (Drive / YouTube / kuch bhi)</label>
+          <label class="field-label">Paste link (Drive / YouTube / any)</label>
           <input type="text" id="eUrl" class="input" placeholder="https://...">
           <label class="field-label">Label (optional)</label>
           <input type="text" id="eLinkName" class="input" placeholder="e.g. Test video">
@@ -159,11 +159,11 @@
       <div class="modal-body">
         <div class="drop" onclick="document.getElementById('fileInput').click()">
           <div class="drop-icon">📎</div>
-          <div class="drop-text">Photos / Videos / Documents chuno</div>
-          <div class="drop-sub">Max 30MB per file. Bade video ke liye "Link add karo".</div>
+          <div class="drop-text">	Choose photos / videos / documents</div>
+          <div class="drop-sub">Max 30MB per file. For larger videos, use "Add Link".</div>
         </div>
         <input type="file" id="fileInput" multiple accept="image/*,video/*,.pdf,.doc,.docx,.xlsx" class="hidden" onchange="queueFiles(this.files)">
-        <label class="field-label" style="margin-top:14px;">Caption (optional, sabhi files pe lagega)</label>
+        <label class="field-label" style="margin-top:14px;">Caption (optional, applies to all files)</label>
         <input type="text" id="uCaption" class="input" placeholder="e.g. Prototype v2 photos">
         <div id="uploadList" class="upload-list"></div>
       </div>
@@ -179,10 +179,10 @@
     <div class="modal">
       <div class="modal-head"><h2>🧪 Review Project</h2><button class="modal-close" onclick="closeModal('reviewModal')">✕</button></div>
       <div class="modal-body">
-        <p class="modal-question">Rating do (approve karte waqt):</p>
+        <p class="modal-question">	Select a rating (required to approve):</p>
         <div class="review-ratings" id="reviewRatings"></div>
         <label class="field-label">Feedback / Remarks</label>
-        <textarea id="rFeedback" class="input" rows="3" placeholder="Kaam kaisa laga? Kya change chahiye?"></textarea>
+        <textarea id="rFeedback" class="input" rows="3" placeholder="How was the work? Any changes needed?"></textarea>
       </div>
       <div class="modal-foot">
         <button class="btn btn-ghost btn-outline-red" style="color:var(--red);border:1px solid var(--red);background:#fff;" onclick="submitReview('Rejected')">✕ Reject</button>
@@ -194,9 +194,9 @@
   <!-- ================= MEMBER PICKER MODAL ================= -->
   <div id="memberModal" class="modal-overlay">
     <div class="modal">
-      <div class="modal-head"><h2>👤 Aap kaun ho?</h2><button class="modal-close" onclick="closeModal('memberModal')">✕</button></div>
+      <div class="modal-head"><h2>👤 Who are you?</h2><button class="modal-close" onclick="closeModal('memberModal')">✕</button></div>
       <div class="modal-body">
-        <p class="modal-question">Apna naam select karo:</p>
+        <p class="modal-question">Select your name:</p>
         <div id="memberList" class="member-list"></div>
       </div>
       <div class="modal-foot">
